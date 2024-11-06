@@ -79,7 +79,7 @@ def txt_to_sql_insert(input_file, output_file):
         );
 
         -- Insert data into the table
-        INSERT INTO misconduct (person, name, allegation, text, consequences, tags) VALUES
+        INSERT INTO misconduct (person, name, allegation, description, consequences, tags) VALUES
         """)
 
         # Generate insert statements
