@@ -61,8 +61,8 @@ def txt_to_sql_insert(input_file, output_file):
     with open(output_file, 'w') as output:
         # Write the CREATE TABLE statement
         output.write("""
-        --Created using misconduct_to_sql.py by PRESTON PARSONS
-        --https://sirobivan.org/index.html
+        -- Created using misconduct_to_sql.py by PRESTON PARSONS
+        -- https://sirobivan.org/index.html
         -- Create the DATABASE
         DROP DATABASE IF EXISTS usCongress;
         CREATE DATABASE usCongress;
