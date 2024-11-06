@@ -109,13 +109,12 @@ def txt_to_sql_insert(input_file, output_file):
             name VARCHAR(25),
             allegation LONGTEXT,
             description LONGTEXT,
-            consequences LONGTEXT,
-            tags LONGTEXT,
-            dateM TEXT
+            date TEXT,
+            tags LONGTEXT
         );
 
         -- Insert data into the table
-        INSERT INTO misconduct (person, name, allegation, description, consequences, tags, dateM) VALUES
+        INSERT INTO misconduct (person, name, allegation, description, date, tags) VALUES
         """)
 
         insert_statements = []
@@ -141,8 +140,7 @@ def txt_to_sql_insert(input_file, output_file):
                 f"'{allegation}', "
                 f"'{text}', "
                 f"'{consequences}', "
-                f"'{tags}',"
-                f"'{date}')"
+                f"'{tags}')"
             )
             insert_statements.append(insert_statement)
 
