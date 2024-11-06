@@ -1,4 +1,6 @@
 import re
+from datetime import datetime
+
 
 # A python file designed specifically to read the contents
 # of con-crim.txt, which is a .txt representation of the
@@ -45,14 +47,30 @@ def txt_to_sql_insert(input_file, output_file):
                 except Exception as e:
                     print(f"Error setting key '{key}' with value '{value}': {e}")
 
-            # Detect start of a consequence entry
+            # Detect start of a consequence entry with date parsing
             elif re.match(r'^\s+-\s+date:', line):
                 inside_consequence = True
                 consequence_details = []
                 key, value = line.strip().split(':', 1)
-                consequence_details.append(f"Date: {value.strip()}")
+                date = value.strip()
 
-            # Continue processing keys in a consequence entry
+                # Detect date format and normalize it
+                try:
+                    # Check if only a year
+                    if re.match(r'^\d{4}$', date):
+                        parsed_date = f"{date}-01-01"  # Default to January 1st for year
+                    # Check if month and year
+                    elif re.match(r'^\d{4}-\d{2}$', date):
+                        parsed_date = f"{date}-01"  # Default to the 1st of the month
+                    # Assume full date format if more parts are provided
+                    else:
+                        parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
+                    # Store the date as just the date value without the 'Date:' label
+                    consequence_details.append(f"{parsed_date}")
+                except ValueError:
+                    print(f"Invalid date format for date '{date}' in line: {line.strip()}")
+
+            # Continue processing keys within a consequence entry
             elif inside_consequence and re.match(r'^\s+(\w+):', line):
                 key, value = line.strip().split(':', 1)
                 consequence_details.append(f"{key.capitalize()}: {value.strip()}")
@@ -61,6 +79,7 @@ def txt_to_sql_insert(input_file, output_file):
             elif inside_consequence and line.strip() == "":
                 current_entry['consequences'] += "; ".join(consequence_details) + " | "
                 inside_consequence = False
+            inside_consequence = False
 
             i += 1
 
@@ -84,11 +103,12 @@ def txt_to_sql_insert(input_file, output_file):
             allegation LONGTEXT,
             description LONGTEXT,
             consequences LONGTEXT,
-            tags LONGTEXT
+            tags LONGTEXT,
+            date TEXT
         );
 
         -- Insert data into the table
-        INSERT INTO misconduct (person, name, allegation, description, consequences, tags) VALUES
+        INSERT INTO misconduct (person, name, allegation, description, consequences, tags, date) VALUES
         """)
 
         insert_statements = []
