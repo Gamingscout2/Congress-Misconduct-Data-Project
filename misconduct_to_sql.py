@@ -111,11 +111,11 @@ def txt_to_sql_insert(input_file, output_file):
             description LONGTEXT,
             consequences LONGTEXT,
             tags LONGTEXT,
-            date TEXT
+            dateM TEXT
         );
 
         -- Insert data into the table
-        INSERT INTO misconduct (person, name, allegation, description, consequences, tags, date) VALUES
+        INSERT INTO misconduct (person, name, allegation, description, consequences, tags, dateM) VALUES
         """)
 
         insert_statements = []
