@@ -71,11 +71,11 @@ def txt_to_sql_insert(input_file, output_file):
         CREATE TABLE misconduct (
             id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
             person INT,
-            name TEXT,
-            allegation TEXT,
-            text TEXT,
-            consequences TEXT,
-            tags TEXT
+            name VARCHAR(25),
+            allegation LONGTEXT,
+            description LONGTEXT,
+            consequences LONGTEXT,
+            tags LONGTEXT
         );
 
         -- Insert data into the table
