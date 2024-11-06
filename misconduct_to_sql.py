@@ -54,7 +54,7 @@ def txt_to_sql_insert(input_file, output_file):
                 key, value = line.strip().split(':', 1)
                 date = value.strip()
 
-                # Detect date format and normalize it
+                # Detect date format and normalize it to only store the date numbers
                 try:
                     # Check if only a year
                     if re.match(r'^\d{4}$', date):
@@ -65,8 +65,16 @@ def txt_to_sql_insert(input_file, output_file):
                     # Assume full date format if more parts are provided
                     else:
                         parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
-                    # Store the date as just the date value without the 'Date:' label
-                    consequence_details.append(f"{parsed_date}")
+
+                    print("PARSED" + parsed_date)
+
+                    # Extract the date portion after '- date:'
+                    numerical_date = parsed_date.split(':')[1].strip()  # Everything after '- date:'
+                    print('NUMER' + numerical_date)
+
+                    # Store the numerical date (YYYY-MM-DD) in the consequence details
+                    consequence_details.append(numerical_date)  # Only store YYYY-MM-DD format
+
                 except ValueError:
                     print(f"Invalid date format for date '{date}' in line: {line.strip()}")
 
@@ -79,7 +87,6 @@ def txt_to_sql_insert(input_file, output_file):
             elif inside_consequence and line.strip() == "":
                 current_entry['consequences'] += "; ".join(consequence_details) + " | "
                 inside_consequence = False
-            inside_consequence = False
 
             i += 1
 
@@ -118,6 +125,15 @@ def txt_to_sql_insert(input_file, output_file):
             text = entry.get('text', '').replace("'", "''")
             consequences = entry['consequences'].strip(" | ").replace("'", "''")
             tags = ', '.join(entry.get('tags', [])).replace("'", "''")
+            date = entry.get('date', '').replace("'", "''")
+            # Ensure the date is in the format YYYY-MM-DD (in case no date field exists, skip it)
+            if date:
+                # Normalize date to YYYY-MM-DD format
+                try:
+                    normalized_date = datetime.strptime(date, '%Y-%m-%d').date()
+                    date = str(normalized_date)  # Convert back to string in YYYY-MM-DD format
+                except ValueError:
+                    print(f"Invalid date format for date '{date}'")
 
             insert_statement = (
                 f"({entry.get('person')}, "
@@ -125,7 +141,8 @@ def txt_to_sql_insert(input_file, output_file):
                 f"'{allegation}', "
                 f"'{text}', "
                 f"'{consequences}', "
-                f"'{tags}')"
+                f"'{tags}',"
+                f"'{date}')"
             )
             insert_statements.append(insert_statement)
 
